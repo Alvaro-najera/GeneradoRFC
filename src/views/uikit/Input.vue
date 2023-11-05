@@ -347,6 +347,7 @@ export default {
                     // Actualizar los campos
                     this.tablaCompras[index].nomProducto = this.productoItem.nomProducto;
                     this.tablaCompras[index].cantidad = this.productoItem.cantidad;
+                    this.productoItem.precioUnitario = parseFloat(this.productoItem.precioUnitario);
                     this.tablaCompras[index].precioUnitario = this.productoItem.precioUnitario;
                     this.tablaCompras[index].precioParcial = this.productoItem.precioUnitario * this.productoItem.cantidad;
                     // Limpiar campos de edición
