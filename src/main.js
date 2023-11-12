@@ -209,6 +209,4 @@ app.component('TreeTable', TreeTable);
 app.component('TriStateCheckbox', TriStateCheckbox);
 app.component('VirtualScroller', VirtualScroller);
 
-//router.push('/login.html'); // Ruta hacia login.html
-//app.mount('#applogin');
 app.mount('#app');

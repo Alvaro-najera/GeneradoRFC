@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'; // Importa useRouter
+const router = useRouter(); // Obtiene el enrutador
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
@@ -7,6 +9,10 @@ const { layoutConfig } = useLayout();
 const email = ref('');
 const password = ref('');
 const checked = ref(false);
+
+const redirectToDashboard = () => {
+    router.push('/dash'); // ruta a la página a la que se va a redirigir.
+};
 
 const logoUrl = computed(() => {
     return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
@@ -39,7 +45,7 @@ const logoUrl = computed(() => {
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div>
-                        <Button label="Sign In" class="w-full p-3 text-xl"></Button>
+                        <Button label="Sign In" class="w-full p-3 text-xl" @click="redirectToDashboard"></Button>
                     </div>
                 </div>
             </div>

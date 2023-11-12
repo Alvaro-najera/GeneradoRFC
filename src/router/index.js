@@ -4,6 +4,11 @@ import AppLayout from '@/layout/AppLayout.vue';
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
+        // {
+        //     // path: '/',
+        //     // name: 'Login',
+        //     // component: () => import('@/views/pages/auth/Login.vue')
+        // },
         {
             path: '/',
             component: AppLayout,

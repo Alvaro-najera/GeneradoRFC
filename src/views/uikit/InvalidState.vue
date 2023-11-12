@@ -1,100 +1,78 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import CountryService from '@/service/CountryService';
-
-const countries = ref(null);
-const filteredCountries = ref(null);
-const value1 = ref(null);
-const value2 = ref(null);
-const value3 = ref(null);
-const value4 = ref(null);
-const value5 = ref(null);
-const value6 = ref(null);
-const value7 = ref(null);
-const value8 = ref(null);
-const value9 = ref(null);
-const value10 = ref(null);
-const cities = ref([
-    { name: 'New York', code: 'NY' },
-    { name: 'Rome', code: 'RM' },
-    { name: 'London', code: 'LDN' },
-    { name: 'Istanbul', code: 'IST' },
-    { name: 'Paris', code: 'PRS' }
-]);
-const countryService = new CountryService();
-
-onMounted(() => {
-    countryService.getCountries().then((data) => {
-        countries.value = data;
-    });
-});
-
-const searchCountry = (event) => {
-    setTimeout(() => {
-        if (!event.query.trim().length) {
-            filteredCountries.value = [...countries];
-        } else {
-            filteredCountries.value = countries.value.filter((country) => {
-                return country.name.toLowerCase().startsWith(event.query.toLowerCase());
-            });
-        }
-    }, 250);
-};
+import { ref, watch } from 'vue';
+import { useLayout } from '@/layout/composables/layout';
 </script>
 
+<script>
+import axios from "axios";
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+    data() {
+        return {
+            aapl: [],
+            opciones: [],
+            datos: [],
+            chartData: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Datos de cambio porcentual trimestral',
+                        data: [],
+                        fill: false,
+                        backgroundColor: '#2f4860',
+                        borderColor: '#2f4860',
+                        tension: .8
+                    }
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        };
+
+    },
+    async mounted() {
+        axios.get("https://eodhistoricaldata.com/api/eod/MCD.US?from=2017-01-05&to=2017-02-05&period=d&fmt=json&api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX", {
+        }).then((response) => {
+            this.aapl = response.data;
+            for (var i = 0; i < this.aapl.length; i++) {
+                var counter = this.aapl[i];
+                this.opciones.push(counter.date),
+                    this.datos.push(counter.close)
+            }
+            this.chartData.labels = this.opciones;
+            this.chartData.datasets[0].data = this.datos;
+
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+});
+</script>
 <template>
     <div class="grid p-fluid">
-        <div class="col">
-            <div class="card">
-                <h5>Invalid State</h5>
-                <div class="p-fluid grid">
-                    <div class="col-12 md:col-6">
-                        <div class="field">
-                            <label for="inputtext">InputText</label>
-                            <InputText id="inputtext" type="text" v-model="value1" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="autocomplete">AutoComplete</label>
-                            <AutoComplete id="autocomplete" v-model="value2" :suggestions="filteredCountries" @complete="searchCountry($event)" field="name" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="calendar">Calendar</label>
-                            <Calendar id="calendar" v-model="value3" class="p-invalid" :showIcon="true" />
-                        </div>
-                        <div class="field">
-                            <label for="chips">Chips</label>
-                            <Chips id="chips" v-model="value4" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="password">Password</label>
-                            <Password id="password" v-model="value10" class="p-invalid" />
-                        </div>
-                    </div>
-
-                    <div class="col-12 md:col-6">
-                        <div class="field">
-                            <label for="inputmask">InputMask</label>
-                            <InputMask id="inputmask" v-model="value5" mask="99/99/9999" slotChar="mm/dd/yyyy" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="inputnumber">InputNumber</label>
-                            <InputNumber id="inputnumber" v-model="value6" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="dropdown">Dropdown</label>
-                            <Dropdown id="dropdown" v-model="value7" :options="cities" optionLabel="name" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="multiselect">MultiSelect</label>
-                            <MultiSelect id="multiselect" v-model="value8" :options="cities" optionLabel="name" class="p-invalid" />
-                        </div>
-                        <div class="field">
-                            <label for="textarea">Textarea</label>
-                            <Textarea id="textarea" v-model="value9" rows="3" class="p-invalid" />
-                        </div>
+        <Panel header="API de datos históricos del mercado de valores de Lyon, Francia" style="height: 100%">
+            <div class="col-12">
+                <div class="card">
+                    <Chart type="line" :data="chartData" :options="options" class="h-40rem"></Chart>
+                </div>
+            </div>
+            <div class="grid col-12">
+                <div class="col-12">
+                    <div class="card">
+                        <h5>Cambio porcentual por dia de acciones AAPL (2017-01-05 / 2017-02-05)</h5>
+                        <DataTable v-bind="value" :value="aapl" showGridlines paginator :rows="6"
+                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                            :rowsPerPageOptions="[3, 10, 15, 24]" tableStyle="min-width: 80rem"
+                            currentPageReportTemplate="Visualizando {last} de {totalRecords} registros!">
+                            <Column field="date" :sortable="true" header="FECHA REGISTRADA"></Column>
+                            <Column field="open" header="VALOR INICIAL"></Column>
+                            <Column field="close" header="VALOR FINAL"></Column>
+                        </DataTable>
                     </div>
                 </div>
             </div>
-        </div>
+        </Panel>
     </div>
 </template>
